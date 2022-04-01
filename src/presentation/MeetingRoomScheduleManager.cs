@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace MeetingRoomScheduler
 {
@@ -34,12 +35,45 @@ namespace MeetingRoomScheduler
             }
             Console.WriteLine("Welcome to Meeting room scheduler");
             Console.WriteLine("Write meeting day");
-            //reads day
-            var day = Console.ReadLine();
+            
+            var day = string.Empty;
+            while (string.IsNullOrWhiteSpace(day))
+            {
+                //reads day as input
+                var input = Console.ReadLine();
+                Regex regex = new Regex(@"^2[0-1][0-9][0-9](-)[0-1][0-9](-)[0-3][0-9]", RegexOptions.IgnorePatternWhitespace);
+                //new Regex(@"^(^0?[1-9]$)|(^1[0-2]$)$", RegexOptions.IgnorePatternWhitespace);
+                Match x = regex.Match(input);
+                //applies regex to input
+                if(x.Success)
+                {
+                    day = input;
+                }
+                else
+                {
+                    Console.WriteLine("Incorrect date your should follow yyyy-MM-dd fortmat");
+                }
+            }
             Console.WriteLine("Your selected day is " + day);
             Console.WriteLine("Write meeting time");
-            // reads time
-            var time = Console.ReadLine();
+            
+            var time = string.Empty;
+            while (string.IsNullOrWhiteSpace(time))
+            {
+                //reads time as innput
+                var input = Console.ReadLine();
+                Regex regex = new Regex(@"^[0-6]\d:[0-6]\d$", RegexOptions.IgnorePatternWhitespace);
+                Match x = regex.Match(input);
+                //applies regex to input
+                if (x.Success)
+                {
+                    time = input;
+                }
+                else
+                {
+                    Console.WriteLine("Incorrect time your should follow hh:mm fortmat");
+                }
+            }
             Console.WriteLine("Your selected time is " + time);
             Console.WriteLine("Select a room from the following");
             var roomList = new List<string>
@@ -53,7 +87,22 @@ namespace MeetingRoomScheduler
                 Console.WriteLine(roomName);
             }
             //selects room by ordered index
-            var selectedIndex = int.Parse(Console.ReadLine());
+            var selectedIndex = -1;
+            while (!(selectedIndex > 0))
+            {
+                try
+                {
+                   var input = Console.ReadLine();
+                    if(!int.TryParse(input, out selectedIndex) || !roomList.Any(x=>x.Contains(input.ToString())))
+                    {
+                        selectedIndex = -1;
+                    }
+                }
+                catch 
+                { 
+                    Console.WriteLine("Wrong room index try again");
+                }
+            }
             var room = roomList[selectedIndex - 1].Split("-")[1];
             Console.WriteLine("Your selected room is " + room);
 
