@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32319.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{187FF3B7-AFFD-4C5C-A9CF-2F98BD2BC20D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingRoomScheduler", "src\presentation\MeetingRoomScheduler.csproj", "{7917F9C9-E53B-4BA3-81A0-AA020B5F50AB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingRoomScheduler.DAL", "src\data-access\MeetingRoomScheduler.DAL.csproj", "{8DB4777C-C29B-4E9A-94A2-716D5137E0B1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MeetingRoomScheduler.API", "src\api\MeetingRoomScheduler.API.csproj", "{043AD5C3-A876-4EEF-82C1-B2545D5F4CBF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7917F9C9-E53B-4BA3-81A0-AA020B5F50AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7917F9C9-E53B-4BA3-81A0-AA020B5F50AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7917F9C9-E53B-4BA3-81A0-AA020B5F50AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7917F9C9-E53B-4BA3-81A0-AA020B5F50AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8DB4777C-C29B-4E9A-94A2-716D5137E0B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8DB4777C-C29B-4E9A-94A2-716D5137E0B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8DB4777C-C29B-4E9A-94A2-716D5137E0B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8DB4777C-C29B-4E9A-94A2-716D5137E0B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{043AD5C3-A876-4EEF-82C1-B2545D5F4CBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{043AD5C3-A876-4EEF-82C1-B2545D5F4CBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{043AD5C3-A876-4EEF-82C1-B2545D5F4CBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{043AD5C3-A876-4EEF-82C1-B2545D5F4CBF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7917F9C9-E53B-4BA3-81A0-AA020B5F50AB} = {187FF3B7-AFFD-4C5C-A9CF-2F98BD2BC20D}
+		{8DB4777C-C29B-4E9A-94A2-716D5137E0B1} = {187FF3B7-AFFD-4C5C-A9CF-2F98BD2BC20D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FCF18273-F836-4B43-8123-FCFCA079FEEF}
+	EndGlobalSection
+EndGlobal
