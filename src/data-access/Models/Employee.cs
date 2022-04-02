@@ -7,6 +7,6 @@
         public string Surname { get; set; }
         public string BadgeId { get; set; }
         public string JobTitle { get; set; }
-        public string Email { get; internal set; }
+        public string Email { get; set; }
     }
 }

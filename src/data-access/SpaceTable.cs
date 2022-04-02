@@ -4,7 +4,6 @@ namespace MeetingRoomScheduler.DAL
 {
     public class SpaceTable
     {
-        public static SpaceTable Current { get; } = new SpaceTable();
         public List<Space> Items { get; } = new List<Space>
         {
             new Space

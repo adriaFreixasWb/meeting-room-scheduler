@@ -4,7 +4,6 @@ namespace MeetingRoomScheduler.DAL
 {
     public class RSVPEmployeesTable
     {
-        public static RSVPEmployeesTable Current { get; } = new RSVPEmployeesTable();
         public List<RSVPEmployee> Items { get; } = new List<RSVPEmployee>
         {
             new RSVPEmployee
