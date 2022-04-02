@@ -16,6 +16,7 @@ namespace MeetingRoomScheduler
         }
         public void Run()
         {
+            /*
             //asks if you want to see scheduled meetings
             Console.WriteLine("Whould you like to see scheduled meetings? (Y/N)");
 
@@ -76,12 +77,16 @@ namespace MeetingRoomScheduler
             }
             Console.WriteLine("Your selected time is " + time);
             Console.WriteLine("Select a room from the following");
-            var roomList = new List<string>
-            {
-                "1-Conference room",
-                "2-Meeting room small",
-                "3-Meeting room big"
-            };
+            //get meeting rooms
+            var meetingRoomsResponse = _httpClient.Send(
+                new HttpRequestMessage
+                {
+                    RequestUri = new Uri("https://localhost:7006/Stance"),
+                    Method = HttpMethod.Get
+                });
+            var roomList = JsonSerializer.Deserialize<List<string>>(meetingRoomsResponse.Content.ReadAsStream())
+                .Select((x,i)=>i + 1 + "-" + x)
+                .ToList();
             foreach (var roomName in roomList)
             {
                 Console.WriteLine(roomName);
@@ -106,9 +111,19 @@ namespace MeetingRoomScheduler
             var room = roomList[selectedIndex - 1].Split("-")[1];
             Console.WriteLine("Your selected room is " + room);
 
-            Console.WriteLine("Input peoples names");
+            Console.WriteLine("Input peoples email");
             var people = Console.ReadLine().Split(", ");
-
+            */
+            var x = Console.ReadKey();
+            var day = "2022-05-15";
+            var time = "09:30";
+            var people = new List<string>
+            {
+                "erika.berger@millenium-mag.com",
+                "lsalander@miltonsecurity.com"
+            };
+            var room = "Glass infinity view";
+            var date = DateTime.ParseExact(day + " " + time, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
             //sends scheduler request
             var meetingScheduledResponse = _httpClient.Send(
                 new HttpRequestMessage
@@ -118,22 +133,31 @@ namespace MeetingRoomScheduler
                     Content = new StringContent(JsonSerializer.Serialize(
                         new MeetingRoomSchedule
                         {
-                            Date = DateTime.ParseExact(day + " " + time, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture),
-                            People = people,
+                            Date = date,
+                            Emails = people,
+                            Title = "TBD",
                             StanceName = room
                         }),Encoding.UTF8,"application/json") 
                     });
-            var scheduledMeeting = JsonSerializer.Deserialize<List<string>>(meetingScheduledResponse.Content.ReadAsStream());
-            if (scheduledMeeting.Any())
+
+            try
             {
-                Console.WriteLine("Your scheduled meeting is:");
-                Console.WriteLine(scheduledMeeting.First());
+                using (var streamReader = new StreamReader(meetingScheduledResponse.Content.ReadAsStream(), Encoding.UTF8))
+                {
+                    var content = streamReader.ReadToEnd();
+                    var scheduledMeeting = JsonSerializer.Deserialize<MeetingRoomSchedule>(content, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                    Console.WriteLine("Your scheduled meeting is:");
+                    Console.WriteLine(scheduledMeeting.StanceName + " at " + scheduledMeeting.Date + " with " + string.Join(",", scheduledMeeting.Emails));
+                }
+                
             }
-            else
+            catch(Exception ex)
             {
                 Console.WriteLine("Something went wrong");
             }
-
         }
     }
 }
