@@ -19,8 +19,9 @@ namespace MeetingRoomScheduler.API.Infrastructure.Appointments
             _employeesTable = employeesTable;
         }
 
-        public List<StanceAppointment> Get()
+        public List<Meeting> Get()
         {
+
             var rsvpEmp = _rsvpTable.Items
             .Join(_rsvpEmployeeTable.Items,
                 rsvp => rsvp.Id,
@@ -37,33 +38,27 @@ namespace MeetingRoomScheduler.API.Infrastructure.Appointments
                 emp => emp.Id,
                 (rsvp, emp) => new { Id = rsvp.Id, Title = rsvp.Title, SpaceName = rsvp.SpaceName, Time = rsvp.Time, Employee = emp.Name + " " +emp.Surname })
             .ToList();
-            var apointments = rsvpName.GroupBy(x => x.Id)
+            var meeting = rsvpName.GroupBy(x => x.Id)
             .Select(x =>
-                new StanceAppointment
-                {
-                    Date = x.First().Time,
-                    Emails = x.Select(x => x.Employee).ToList(),
-                    StanceName = x.First().SpaceName,
-                    Title = x.First().Title,
-                }).ToList();
-            return apointments;
+                new Meeting((uint)x.First().Id, x.First().Time, x.First().Title)).ToList();
+            return meeting;
         }
 
-        public void Create(StanceAppointmentRequest appointment)
+        public void Create(Meeting meeting)
         {
             
-            var space = _spaceTable.Items.First(x=>x.Name == appointment.StanceName);
+            var space = _spaceTable.Items.First(x=>x.Name == meeting.MeetingRoom.Name);
             var rsvpEmp = _rsvpTable.Items.Last();
             _rsvpTable.Items.Add(new RSVP
             {
                 Id = rsvpEmp.Id + 1,
                 SpaceId = space.Id,
-                Time = appointment.Date,
-                Title = appointment.Title,
+                Time = meeting.Date,
+                Title = meeting.Title,
             });
-            foreach (var email in appointment.Emails)
+            foreach (var attendiee in meeting.Attendiees)
             {
-                var employee = _employeesTable.Items.First(x => x.Email == email);
+                var employee = _employeesTable.Items.First(x => x.Email == attendiee.Email);
                 _rsvpEmployeeTable.Items.Add(new RSVPEmployee
                 {
                     EmployeeId = employee.Id,

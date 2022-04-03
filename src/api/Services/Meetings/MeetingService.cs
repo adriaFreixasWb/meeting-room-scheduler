@@ -20,14 +20,17 @@ namespace MeetingRoomScheduler.API.Services
             _meetingRoomService = meetingRoomService;
         }
 
-        public List<StanceAppointment> Get()
+        public List<Meeting> Get()
         {
             return _repository.Get();
         }
 
-        public StanceAppointment Create(StanceAppointmentRequest appointment)
+        public Meeting Create(MeetingRequest request)
         {
-            _repository.Create(appointment);
+            //todo create meeting
+            var meeting = new Meeting(0, request.Date, request.Title);
+            
+            _repository.Create(meeting);
             return _repository.Get().Last();
         }
 

@@ -16,30 +16,30 @@ namespace MeetingRoomScheduler.API.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return _meetingService.Get().Select(x => x.StanceName +" "+ string.Join(", ", x.Emails) + " at " + x.Date.ToString());
+            return _meetingService.Get().Select(x => x.MeetingRoom +" "+ string.Join(", ", x.Attendiees.Select(x => x.Email)) + " at " + x.Date.ToString());
         }
 
         [HttpPost]
-        public ActionResult Create(StanceAppointmentRequest appointment)
+        public ActionResult Create(MeetingRequest meeting)
         {
-            if(!_emailValidator.AllMatch(appointment.Emails))
+            if(!_emailValidator.AllMatch(meeting.Emails))
             {
                 return BadRequest("Email inconsistency");
             }
-            if(!_meetingService.CheckAllAssitantsExist(appointment.Emails))
+            if(!_meetingService.CheckAllAssitantsExist(meeting.Emails))
             {
                 return BadRequest("Employee not found");
             }
-            if(DateTime.Now > appointment.Date)
+            if(DateTime.Now > meeting.Date)
             {
                 return BadRequest("Cannot set meeting at past time");
             }
-            if(!_meetingService.CheckMeetingRoomExists(appointment.StanceName))
+            if(!_meetingService.CheckMeetingRoomExists(meeting.MeetingRoom))
             {
                 return BadRequest("Meeting room does not exist");
             }
 
-            _meetingService.Create(appointment);
+            _meetingService.Create(meeting);
             var result = _meetingService.Get().Last();
             return Ok(result);
         }
