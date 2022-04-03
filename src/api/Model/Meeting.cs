@@ -37,6 +37,9 @@
             }
         }
 
-        
+        internal void AddMeetingRoom(MeetingRoom meetingRoom)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

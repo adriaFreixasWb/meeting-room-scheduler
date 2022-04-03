@@ -22,26 +22,32 @@ namespace MeetingRoomScheduler.API.Infrastructure.Appointments
         public List<Meeting> Get()
         {
 
-            var rsvpEmp = _rsvpTable.Items
-            .Join(_rsvpEmployeeTable.Items,
-                rsvp => rsvp.Id,
-                rsem => rsem.RSVP_Id,
-                (rsvp, rsem) => new { Id = rsvp.Id, Title = rsvp.Title, SpaceId = rsvp.SpaceId, Time = rsvp.Time, EmployeeId = rsem.EmployeeId })
-            .ToList();
-            var rsvpSp = rsvpEmp.Join(_spaceTable.Items,
+            var rsvpSpace = _rsvpTable.Items
+                .Join(_spaceTable.Items,
                 rsvp => rsvp.SpaceId,
                 spa => spa.Id,
-                (rsvp, spa) => new { Id = rsvp.Id, Title = rsvp.Title, SpaceName = spa.Name, Time = rsvp.Time, EmployeeId = rsvp.EmployeeId })
-            .ToList();
-            var rsvpName = rsvpSp.Join(_employeesTable.Items,
-                rsvp => rsvp.EmployeeId,
+                (rsvp, spa) => new { Meeting = new Meeting((uint)rsvp.Id, rsvp.Time, rsvp.Title), MeetingRoom = new MeetingRoom(spa.Id, spa.Name) });
+            var result = new Dictionary<uint, Meeting>();
+            
+            foreach (var item in rsvpSpace)
+            {
+                var meeting = item.Meeting;
+                meeting.AddMeetingRoom(item.MeetingRoom);
+                result.Add(meeting.Id, meeting);
+            }
+
+            var employees = _rsvpEmployeeTable.Items.Join(_employeesTable.Items,
+                rsvpEmp => rsvpEmp.EmployeeId,
                 emp => emp.Id,
-                (rsvp, emp) => new { Id = rsvp.Id, Title = rsvp.Title, SpaceName = rsvp.SpaceName, Time = rsvp.Time, Employee = emp.Name + " " +emp.Surname })
-            .ToList();
-            var meeting = rsvpName.GroupBy(x => x.Id)
-            .Select(x =>
-                new Meeting((uint)x.First().Id, x.First().Time, x.First().Title)).ToList();
-            return meeting;
+                (rsvpEmp, emp) => new { Id = (uint)rsvpEmp.RSVP_Id, Attendiee = new Attendiee((uint)emp.Id, emp.Name + " " + emp.Surname, emp.Email) });
+            
+            foreach (var employee in employees)
+            {
+                result[employee.Id].AddAttendies(employee.Attendiee);
+            }
+            
+            return result.Values.ToList();
+
         }
 
         public void Create(Meeting meeting)
