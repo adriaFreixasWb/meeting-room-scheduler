@@ -16,7 +16,7 @@ namespace MeetingRoomScheduler
         }
         public void Run()
         {
-            /*
+            
             //asks if you want to see scheduled meetings
             Console.WriteLine("Whould you like to see scheduled meetings? (Y/N)");
 
@@ -43,7 +43,6 @@ namespace MeetingRoomScheduler
                 //reads day as input
                 var input = Console.ReadLine();
                 Regex regex = new Regex(@"^2[0-1][0-9][0-9](-)[0-1][0-9](-)[0-3][0-9]", RegexOptions.IgnorePatternWhitespace);
-                //new Regex(@"^(^0?[1-9]$)|(^1[0-2]$)$", RegexOptions.IgnorePatternWhitespace);
                 Match x = regex.Match(input);
                 //applies regex to input
                 if(x.Success)
@@ -81,7 +80,7 @@ namespace MeetingRoomScheduler
             var meetingRoomsResponse = _httpClient.Send(
                 new HttpRequestMessage
                 {
-                    RequestUri = new Uri("https://localhost:7006/Stance"),
+                    RequestUri = new Uri("https://localhost:7006/MeetingRoom"),
                     Method = HttpMethod.Get
                 });
             var roomList = JsonSerializer.Deserialize<List<string>>(meetingRoomsResponse.Content.ReadAsStream())
@@ -113,7 +112,8 @@ namespace MeetingRoomScheduler
 
             Console.WriteLine("Input peoples email");
             var people = Console.ReadLine().Split(", ");
-            */
+
+            /*
             var x = Console.ReadKey();
             var day = "2022-05-15";
             var time = "09:30";
@@ -123,7 +123,10 @@ namespace MeetingRoomScheduler
                 "lsalander@miltonsecurity.com"
             };
             var room = "Glass infinity view";
+            
+            */
             var date = DateTime.ParseExact(day + " " + time, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+
             //sends scheduler request
             var meetingScheduledResponse = _httpClient.Send(
                 new HttpRequestMessage
@@ -136,7 +139,7 @@ namespace MeetingRoomScheduler
                             Date = date,
                             Emails = people,
                             Title = "TBD",
-                            StanceName = room
+                            MeetingRoom = room
                         }),Encoding.UTF8,"application/json") 
                     });
 
@@ -145,12 +148,13 @@ namespace MeetingRoomScheduler
                 using (var streamReader = new StreamReader(meetingScheduledResponse.Content.ReadAsStream(), Encoding.UTF8))
                 {
                     var content = streamReader.ReadToEnd();
+                    
                     var scheduledMeeting = JsonSerializer.Deserialize<MeetingRoomSchedule>(content, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
                     });
                     Console.WriteLine("Your scheduled meeting is:");
-                    Console.WriteLine(scheduledMeeting.StanceName + " at " + scheduledMeeting.Date + " with " + string.Join(",", scheduledMeeting.Emails));
+                    Console.WriteLine(scheduledMeeting.MeetingRoom + " at " + scheduledMeeting.Date + " with " + string.Join(",", scheduledMeeting.Emails));
                 }
                 
             }

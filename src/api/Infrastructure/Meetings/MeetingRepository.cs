@@ -1,8 +1,9 @@
-﻿using MeetingRoomScheduler.API.Model;
+﻿using MeetingRoomScheduler.API.Infrastructure.Employees;
+using MeetingRoomScheduler.API.Model;
 using MeetingRoomScheduler.DAL;
 using MeetingRoomScheduler.DAL.Models;
 
-namespace MeetingRoomScheduler.API.Infrastructure.Appointments
+namespace MeetingRoomScheduler.API.Infrastructure.Meetings
 {
     public class MeetingRepository
     {
@@ -21,43 +22,44 @@ namespace MeetingRoomScheduler.API.Infrastructure.Appointments
 
         public List<Meeting> Get()
         {
-
-            var rsvpSpace = _rsvpTable.Items
+            var meetings = _rsvpTable.Items
                 .Join(_spaceTable.Items,
                 rsvp => rsvp.SpaceId,
                 spa => spa.Id,
-                (rsvp, spa) => new { Meeting = new Meeting((uint)rsvp.Id, rsvp.Time, rsvp.Title), MeetingRoom = new MeetingRoom(spa.Id, spa.Name) });
-            var result = new Dictionary<uint, Meeting>();
-            
-            foreach (var item in rsvpSpace)
-            {
-                var meeting = item.Meeting;
-                meeting.AddMeetingRoom(item.MeetingRoom);
-                result.Add(meeting.Id, meeting);
-            }
+                (rsvp, spa) => rsvp.ToMeetingWithRoom(spa))
+                .ToList();
 
-            var employees = _rsvpEmployeeTable.Items.Join(_employeesTable.Items,
+            var attendieeGroups = _rsvpEmployeeTable.Items.Join(_employeesTable.Items,
                 rsvpEmp => rsvpEmp.EmployeeId,
                 emp => emp.Id,
-                (rsvpEmp, emp) => new { Id = (uint)rsvpEmp.RSVP_Id, Attendiee = new Attendiee((uint)emp.Id, emp.Name + " " + emp.Surname, emp.Email) });
-            
-            foreach (var employee in employees)
-            {
-                result[employee.Id].AddAttendies(employee.Attendiee);
-            }
-            
-            return result.Values.ToList();
+                (rsvpEmp, emp) => new { Id = (uint)rsvpEmp.RSVP_Id, Attendiee = emp.ToAttendee() })
+                .GroupBy(x=>x.Id)
+                .ToDictionary(x=>x.Key, v=>v.Select(x=>x.Attendiee));
 
+            return meetings.AssociateAttendeesToMeeting(attendieeGroups);
+
+        }        
+        public Meeting GetBy(uint id)
+        {
+            var rsvp = _rsvpTable.Items.First(x => x.Id == id);
+            var space = _spaceTable.Items.First(x => x.Id == rsvp.SpaceId);
+            var attendees = _rsvpEmployeeTable.Items.Where(x => x.RSVP_Id == rsvp.Id)
+                .Join(_employeesTable.Items,
+                rsvp => rsvp.EmployeeId,
+                emp => emp.Id,
+                (rsvp, emp) => emp.ToAttendee());
+            var meeting = rsvp.ToMeetingWithRoom(space);
+            meeting.AddAttendees(attendees.ToArray());
+            return meeting;
         }
 
-        public void Create(Meeting meeting)
+        public uint Create(Meeting meeting)
         {
-            
             var space = _spaceTable.Items.First(x=>x.Name == meeting.MeetingRoom.Name);
-            var rsvpEmp = _rsvpTable.Items.Last();
+            var id = GetNextRSVPIndex();
             _rsvpTable.Items.Add(new RSVP
             {
-                Id = rsvpEmp.Id + 1,
+                Id = id,
                 SpaceId = space.Id,
                 Time = meeting.Date,
                 Title = meeting.Title,
@@ -68,10 +70,16 @@ namespace MeetingRoomScheduler.API.Infrastructure.Appointments
                 _rsvpEmployeeTable.Items.Add(new RSVPEmployee
                 {
                     EmployeeId = employee.Id,
-                    RSVP_Id = rsvpEmp.Id + 1
+                    RSVP_Id = id
                 });
             }
-            
+            return (uint)id;
+        }
+
+        public int GetNextRSVPIndex()
+        {
+            var rsvp = _rsvpTable.Items.Last();
+            return rsvp.Id + 1;
         }
     }
 }

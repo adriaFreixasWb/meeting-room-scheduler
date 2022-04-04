@@ -1,7 +1,7 @@
 ﻿using MeetingRoomScheduler.API.Employees;
-using MeetingRoomScheduler.API.Infrastructure.Appointments;
+using MeetingRoomScheduler.API.Infrastructure.Meetings;
 using MeetingRoomScheduler.API.Infrastructure.Employees;
-using MeetingRoomScheduler.API.Infrastructure.Stances;
+using MeetingRoomScheduler.API.Infrastructure.MeetingRooms;
 using MeetingRoomScheduler.API.Services.MeetingRooms;
 using MeetingRoomScheduler.API.Validators;
 using MeetingRoomScheduler.DAL;

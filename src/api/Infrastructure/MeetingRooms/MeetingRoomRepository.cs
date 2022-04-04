@@ -1,7 +1,8 @@
-﻿using MeetingRoomScheduler.DAL;
+﻿using MeetingRoomScheduler.API.Model;
+using MeetingRoomScheduler.DAL;
 using MeetingRoomScheduler.DAL.Models;
 
-namespace MeetingRoomScheduler.API.Infrastructure.Stances
+namespace MeetingRoomScheduler.API.Infrastructure.MeetingRooms
 {
     public class MeetingRoomRepository
     {
@@ -19,6 +20,16 @@ namespace MeetingRoomScheduler.API.Infrastructure.Stances
         public IEnumerable<Space> Search(string name)
         {
             return _spaceTable.Items.Where(x => x.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public MeetingRoom GetBy(string name)
+        {
+            var spaces = Search(name);
+            if (spaces == null || !spaces.Any())
+            {
+                return null;
+            }
+            return spaces.First().ToMeetingRoom();
         }
     }
 }

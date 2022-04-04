@@ -1,4 +1,5 @@
-﻿using MeetingRoomScheduler.API.Infrastructure.Stances;
+﻿using MeetingRoomScheduler.API.Infrastructure.MeetingRooms;
+using MeetingRoomScheduler.API.Model;
 using MeetingRoomScheduler.DAL.Models;
 
 namespace MeetingRoomScheduler.API.Services.MeetingRooms
@@ -21,6 +22,11 @@ namespace MeetingRoomScheduler.API.Services.MeetingRooms
         {
             return _meetingRoomRepository.Search(meetingRoom)
                 .Any(x => x.Name.Equals(meetingRoom, StringComparison.InvariantCultureIgnoreCase));
+        }
+
+        public MeetingRoom GetBy(string name)
+        {
+            return _meetingRoomRepository.GetBy(name);
         }
     }
 }

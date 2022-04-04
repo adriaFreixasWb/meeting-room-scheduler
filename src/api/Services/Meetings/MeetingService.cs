@@ -1,9 +1,10 @@
 ﻿using MeetingRoomScheduler.API.Employees;
-using MeetingRoomScheduler.API.Infrastructure.Appointments;
-using MeetingRoomScheduler.API.Infrastructure.Stances;
+using MeetingRoomScheduler.API.Infrastructure.Meetings;
+using MeetingRoomScheduler.API.Infrastructure.MeetingRooms;
 using MeetingRoomScheduler.API.Model;
 using MeetingRoomScheduler.API.Services.MeetingRooms;
 using MeetingRoomScheduler.DAL.Models;
+using MeetingRoomScheduler.API.Infrastructure.Employees;
 
 namespace MeetingRoomScheduler.API.Services
 {
@@ -27,11 +28,23 @@ namespace MeetingRoomScheduler.API.Services
 
         public Meeting Create(MeetingRequest request)
         {
-            //todo create meeting
-            var meeting = new Meeting(0, request.Date, request.Title);
             
-            _repository.Create(meeting);
-            return _repository.Get().Last();
+            var meetingRoom = _meetingRoomService.GetBy(request.MeetingRoom);
+            if(meetingRoom == null)
+            {
+                return null;
+            }
+            var meeting = new Meeting(request.Date, request.Title);
+            meeting.AddMeetingRoom(meetingRoom);
+            var attendees = _employeeService.GetByEmail(request.Emails)
+                .Select(x => x.ToAttendee());
+            meeting.AddAttendees(attendees.ToArray());
+            if(!meeting.HasMinimumAttendies)
+            {
+                throw new ArgumentException("Not enough attendes");
+            }
+            var id = _repository.Create(meeting);
+            return _repository.GetBy(id);
         }
 
         public bool CheckAllAssitantsExist(IEnumerable<string> emails)
